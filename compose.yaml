@@ -1,0 +1,35 @@
+services:
+
+  postgres:
+    image: postgres:latest
+    env_file: .env
+    environment:
+      POSTGRES_DB: $PROJETO_POSTGRES_DB
+      POSTGRES_USER: $PROJETO_POSTGRES_USER
+      POSTGRES_PASSWORD: $PROJETO_POSTGRES_PASSWORD
+    ports:
+      - $PROJETO_POSTGRES_LOCAL_PORT:$PROJETO_POSTGRES_DOCKER_PORT
+    volumes:
+      - projeto_postgres_db:/var/lib/postgresql/data
+    networks:
+      - projeto-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    env_file: .env
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: $PROJETO_PGADMIN_DEFAULT_EMAIL
+      PGADMIN_DEFAULT_PASSWORD: $PROJETO_PGADMIN_DEFAULT_PASSWORD
+    ports:
+      - $PROJETO_PGADMIN_LOCAL_PORT:$PROJETO_PGADMIN_DOCKER_PORT
+    networks:
+      - projeto-network
+
+volumes:
+  projeto_postgres_db:
+
+networks:
+  projeto-network:
+    driver: bridge
