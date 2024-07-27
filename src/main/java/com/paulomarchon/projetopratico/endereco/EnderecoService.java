@@ -6,6 +6,7 @@ import com.paulomarchon.projetopratico.cidade.dto.RequisicaoCadastroCidade;
 import com.paulomarchon.projetopratico.endereco.dto.RequisicaoAlteracaoEndereco;
 import com.paulomarchon.projetopratico.endereco.dto.RequisicaoCadastroEndereco;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EnderecoService {
@@ -17,6 +18,7 @@ public class EnderecoService {
         this.cidadeService = cidadeService;
     }
 
+    @Transactional
     public Endereco salvarEndereco(RequisicaoCadastroEndereco cadastroEndereco) {
         Cidade cidade = buscaCidade(cadastroEndereco.cidade(), cadastroEndereco.uf());
 
@@ -31,6 +33,7 @@ public class EnderecoService {
         return enderecoDao.salvarEndereco(endereco);
     }
 
+    @Transactional
     public void alterarEndereco(Integer enderecoId, RequisicaoAlteracaoEndereco alteracaoEndereco) {
         Endereco endereco = enderecoDao.selecionarEnderecoPorReferenciaDeId(enderecoId);
 
