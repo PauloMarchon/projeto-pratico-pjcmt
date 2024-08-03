@@ -50,7 +50,7 @@ public class UnidadeJpaDataAccessServiceTest {
     }
 
     @Test
-    void delecionarUnidadePorId(){
+    void selecionarUnidadePorId(){
         Integer id = 1;
 
         emTeste.selecionarUnidadePorId(id);
