@@ -92,6 +92,7 @@ public class PessoaService {
         pessoaDao.alterarPessoa(pessoa);
     }
 
+    @Transactional
     public void cadastrarEnderecoDePessoa(Integer pessoaId, RequisicaoCadastroEndereco cadastroEndereco) {
         Pessoa pessoa = pessoaDao.buscarPessoaPorReferenciaDeId(pessoaId);
 
@@ -100,6 +101,7 @@ public class PessoaService {
         );
     }
 
+    @Transactional
     public void alterarEnderecoDePessoa(Integer pessoaId, RequisicaoAlteracaoEndereco alteracaoEndereco) {
         Pessoa pessoa = pessoaDao.buscarPessoaPorReferenciaDeId(pessoaId);
 

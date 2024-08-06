@@ -8,6 +8,7 @@ import com.paulomarchon.projetopratico.pessoa.dto.PessoaDto;
 import com.paulomarchon.projetopratico.pessoa.dto.RequisicaoCadastroPessoa;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,14 +171,13 @@ public class PessoaControllerTest extends AbstractIntegrationTest {
                 .statusCode(201);
     }
 
-    /*
     @Test
     void deveAlterarEnderecoDePessoa() {
         RequisicaoCadastroPessoa cadastroPessoa = new RequisicaoCadastroPessoa("ROBERTO", LocalDate.now(), SexoPessoa.MASCULINO, "ROSA", "VALMIR");
-        RequisicaoCadastroEndereco alteracaoEndereco = new RequisicaoCadastroEndereco("RUA", "SAO JOSE", 20, "VILA NOVA", "SAO PAULO", "SP");
+        RequisicaoCadastroEndereco cadastroEndereco = new RequisicaoCadastroEndereco("RUA", "SAO JOSE", 20, "VILA NOVA", "RIO DE JANEIRO", "RJ");
 
         PessoaDto pessoaDto = pessoaService.cadastrarPessoa(cadastroPessoa);
-        pessoaService.cadastrarEnderecoDePessoa(pessoaDto.id(), alteracaoEndereco);
+        pessoaService.cadastrarEnderecoDePessoa(pessoaDto.id(), cadastroEndereco);
 
         given().contentType(ContentType.JSON)
                 .body(
@@ -187,8 +187,8 @@ public class PessoaControllerTest extends AbstractIntegrationTest {
                             "logradouro": "BOULEVARD",
                             "numero": 125,
                             "bairro": "",
-                            "cidade": "",
-                            "uf": ""
+                            "cidade": "SAO PAULO",
+                            "uf": "SP"
                           }
                         """
                 )
@@ -197,7 +197,7 @@ public class PessoaControllerTest extends AbstractIntegrationTest {
                 .then()
                 .statusCode(200);
     }
-    */
+
 
     @Test
     void deveExcluirPessoa() {
