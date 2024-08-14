@@ -27,8 +27,24 @@ services:
     networks:
       - projeto-network
 
+  minio:
+    image: docker.io/bitnami/minio:latest
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: $PROJETO_MINIO_ROOT_USER
+      MINIO_ROOT_PASSWORD: $PROJETO_MINIO_ROOT_PASSWORD
+      MINIO_DEFAULT_BUCKETS: $PROJETO_MINIO_DEFAULT_BUCKETS
+    volumes:
+      - 'minio_data:/data'
+    networks:
+      - projeto-network
+
 volumes:
   projeto_postgres_db:
+  minio_data:
+    driver: local
 
 networks:
   projeto-network:
