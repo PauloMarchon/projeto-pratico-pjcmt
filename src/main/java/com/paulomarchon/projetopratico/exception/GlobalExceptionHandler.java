@@ -15,10 +15,15 @@ public class GlobalExceptionHandler {
         return ex.problemDetail();
     }
 
-
     @ExceptionHandler(RecursoNaoEncontradoException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ProblemDetail handleRecursoNaoEncontradoException(RecursoNaoEncontradoException ex) {
+        return ex.problemDetail();
+    }
+
+    @ExceptionHandler(FalhaNoServicoS3Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ProblemDetail handleFalhaNoServidorS3Exception(FalhaNoServicoS3Exception ex) {
         return ex.problemDetail();
     }
 }
