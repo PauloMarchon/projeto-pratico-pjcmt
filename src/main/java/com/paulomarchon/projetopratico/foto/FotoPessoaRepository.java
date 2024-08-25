@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface FotoPessoaRepository extends JpaRepository<FotoPessoa, Integer> {
     List<FotoPessoa> findAllByPessoa(Pessoa pessoa);
+    boolean existsByHash(String hash);
 
     @Transactional
     void deleteAllByHashIn(List<String> hash);

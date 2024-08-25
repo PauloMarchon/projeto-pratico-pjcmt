@@ -27,4 +27,9 @@ public class FotoPessoaJpaDataAccessService implements  FotoPessoaDao {
     public void excluirFotoDePessoaPorHash(List<String> hash) {
         fotoPessoaRepository.deleteAllByHashIn(hash);
     }
+
+    @Override
+    public boolean existeFotoDePessoaPorHash(String hash) {
+        return fotoPessoaRepository.existsByHash(hash);
+    }
 }

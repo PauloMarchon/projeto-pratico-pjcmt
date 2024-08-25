@@ -8,4 +8,5 @@ public interface FotoPessoaDao {
     List<FotoPessoa> recuperarTodasFotosDePessoa(Pessoa pessoa);
     void adicionarFotosDePessoa(List<FotoPessoa> fotos);
     void excluirFotoDePessoaPorHash(List<String> hash);
+    boolean existeFotoDePessoaPorHash(String hash);
 }

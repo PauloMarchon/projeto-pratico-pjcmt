@@ -90,9 +90,8 @@ public class FotoPessoaService {
         List<DeleteObject> objects = new LinkedList<>();
 
         for (String hash : imagemHash) {
-            objects.add(
-                    new DeleteObject(hash)
-            );
+            if (fotoPessoaDao.existeFotoDePessoaPorHash(hash))
+                objects.add(new DeleteObject(hash));
         }
 
         try {
