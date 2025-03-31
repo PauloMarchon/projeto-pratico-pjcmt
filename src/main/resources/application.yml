@@ -9,6 +9,12 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+    codec:
+      max-in-memory-size: 10MB
 
 springdoc:
   api-docs:
@@ -17,8 +23,8 @@ springdoc:
     path: /docs-ui.html
 
 minio:
-  access-key: 'xDM3aBJsyqpiYrkUbzse'
-  secret-key: 'qJxpxbSigrL0vTs2E1O4WKFMYkFS36E7ILMFDTu3'
+  access-key: 'MrH4MEHUqxNt4TIDJNcK'
+  secret-key: 'lBYkT16hedaBrCj2xTT6TT0fHf6QsHDsiDfIOgsZ'
   buckets:
-    foto: foto-pessoa
+    bucketFotoPessoa: foto-pessoa
   endpoint: 'http://localhost:9000'

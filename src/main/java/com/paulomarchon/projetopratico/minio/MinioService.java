@@ -26,12 +26,10 @@ public class MinioService {
         this.minioClient = minioClient;
     }
 
-    public void enviarImagens(String nomeBucket, List<SnowballObject> imagens) {
+    public void enviarImagens(PutObjectArgs objectArgs) {
         try{
-            minioClient.uploadSnowballObjects(UploadSnowballObjectsArgs.builder()
-                    .bucket(nomeBucket)
-                    .objects(imagens)
-                    .build()
+            minioClient.putObject(
+                    objectArgs
             );
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException |

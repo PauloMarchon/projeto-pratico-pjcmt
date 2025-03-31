@@ -7,13 +7,13 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "minio.buckets")
 public class MinioBuckets {
 
-    private String foto;
+    private String bucketFotoPessoa;
 
-    public String getFoto() {
-        return foto;
+    public String getBucketFotoPessoa() {
+        return bucketFotoPessoa;
     }
 
-    public void setFoto(String foto) {
-        this.foto = foto;
+    public void setBucketFotoPessoa(String bucketFotoPessoa) {
+        this.bucketFotoPessoa = bucketFotoPessoa;
     }
 }
