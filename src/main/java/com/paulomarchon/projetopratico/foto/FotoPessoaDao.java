@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface FotoPessoaDao {
     List<FotoPessoa> recuperarTodasFotosDePessoa(Pessoa pessoa);
-    void adicionarFotosDePessoa(List<FotoPessoa> fotos);
+    void adicionarFotoDePessoa(FotoPessoa foto);
     void excluirFotoDePessoaPorHash(List<String> hash);
     boolean existeFotoDePessoaPorHash(String hash);
 }

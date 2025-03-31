@@ -19,8 +19,8 @@ public class FotoPessoaJpaDataAccessService implements  FotoPessoaDao {
     }
 
     @Override
-    public void adicionarFotosDePessoa(List<FotoPessoa> fotos) {
-        fotoPessoaRepository.saveAll(fotos);
+    public void adicionarFotoDePessoa(FotoPessoa foto) {
+        fotoPessoaRepository.save(foto);
     }
 
     @Override

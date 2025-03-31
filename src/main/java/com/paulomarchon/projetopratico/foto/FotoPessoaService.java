@@ -4,18 +4,15 @@ import com.paulomarchon.projetopratico.exception.FalhaNoServicoS3Exception;
 import com.paulomarchon.projetopratico.minio.MinioBuckets;
 import com.paulomarchon.projetopratico.minio.MinioService;
 import com.paulomarchon.projetopratico.pessoa.Pessoa;
-import io.minio.SnowballObject;
+import io.minio.PutObjectArgs;
 import io.minio.messages.DeleteObject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -33,55 +30,42 @@ public class FotoPessoaService {
         this.minioService = minioService;
     }
 
-    public List<String> recuperarTodasFotosDePessoa(Pessoa pessoa) {
+    public List<String> recuperarFotosDePessoa(Pessoa pessoa) {
         List<String> imagensHash =
                 fotoPessoaDao.recuperarTodasFotosDePessoa(pessoa).stream()
                                 .map(FotoPessoa::getHash)
                                 .collect(Collectors.toList());
 
-        return minioService.recuperarImagens(minioBuckets.getFoto(), imagensHash);
+        return minioService.recuperarImagens(minioBuckets.getBucketFotoPessoa(), imagensHash);
     }
 
     @Transactional
-    public void salvarFotosDePessoa(Pessoa pessoa, List<MultipartFile> fotos) {
-        List<FotoPessoa> fotosPessoa = new ArrayList<>();
-        List<SnowballObject> objetosS3 = new ArrayList<>();
-
+    public void salvarFotosDePessoa(Pessoa pessoa, MultipartFile[] fotos) {
         for (MultipartFile foto : fotos) {
-            String hash = UUID.randomUUID().toString();
+            try {
+                String hash = UUID.randomUUID().toString();
 
-            fotosPessoa.add(preparaFotoDePessoa(pessoa, hash));
-            objetosS3.add(preparaFotosParaServidorS3(hash, foto));
-        }
+                fotoPessoaDao.adicionarFotoDePessoa(
+                        new FotoPessoa(
+                                pessoa,
+                                LocalDate.now(),
+                                minioBuckets.getBucketFotoPessoa(),
+                                hash
+                        )
+                );
 
-        try {
-            minioService.enviarImagens(minioBuckets.getFoto(), objetosS3);
+                minioService.enviarImagens(
+                        PutObjectArgs.builder()
+                                .bucket(minioBuckets.getBucketFotoPessoa())
+                                .object(hash)
+                                .stream(foto.getInputStream(), foto.getSize(), -1)
+                                .contentType(foto.getContentType())
+                                .build()
+                );
 
-            fotoPessoaDao.adicionarFotosDePessoa(fotosPessoa);
-        } catch (FalhaNoServicoS3Exception e) {
-            throw new FalhaNoServicoS3Exception("Erro ao adicionar fotos de pessoa", e);
-        }
-    }
-
-    private  FotoPessoa preparaFotoDePessoa(Pessoa pessoa, String hash) {
-        return new FotoPessoa(
-                        pessoa,
-                        LocalDate.now(),
-                        minioBuckets.getFoto(),
-                        hash
-        );
-    }
-
-    private SnowballObject preparaFotosParaServidorS3(String hash, MultipartFile foto) {
-        try {
-            return new SnowballObject(
-                            hash,
-                            new ByteArrayInputStream(foto.getBytes()),
-                            foto.getSize(),
-                            ZonedDateTime.now()
-            );
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao processar o arquivo de foto");
+            } catch (FalhaNoServicoS3Exception | IOException e ) {
+                throw new FalhaNoServicoS3Exception("Erro ao adicionar fotos de pessoa", e);
+            }
         }
     }
 
@@ -95,7 +79,7 @@ public class FotoPessoaService {
         }
 
         try {
-            minioService.excluirImagens(minioBuckets.getFoto(), objects);
+            minioService.excluirImagens(minioBuckets.getBucketFotoPessoa(), objects);
 
             fotoPessoaDao.excluirFotoDePessoaPorHash(imagemHash);
         } catch (FalhaNoServicoS3Exception e) {
