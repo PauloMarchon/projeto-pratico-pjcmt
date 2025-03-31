@@ -7,6 +7,7 @@ import com.paulomarchon.projetopratico.cidade.dto.RequisicaoCadastroCidade;
 import com.paulomarchon.projetopratico.endereco.dto.RequisicaoAlteracaoEndereco;
 import com.paulomarchon.projetopratico.endereco.dto.RequisicaoCadastroEndereco;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -33,7 +34,8 @@ public class EnderecoServiceTest {
     }
 
     @Test
-    void deveSalvarEnderecoCorretamente(){
+    @DisplayName("Deve salvar endereco com sucesso")
+    void salvarEndereco_quandoInformado_entaoCadastraEnderecoComSucesso(){
         RequisicaoCadastroEndereco cadastroEndereco = new RequisicaoCadastroEndereco("AVENIDA", "GUIMARAES", 155, "CENTRO", "SAO PAULO", "SP");
         RequisicaoCadastroCidade cadastroCidade = new RequisicaoCadastroCidade(cadastroEndereco.cidade(), cadastroEndereco.uf());
         Cidade cidade = new Cidade("SAO PAULO", UF.SP);
@@ -56,7 +58,8 @@ public class EnderecoServiceTest {
     }
 
     @Test
-    void deveRetornarEnderecoSalvoCorretamente(){
+    @DisplayName("Deve retornar o endereco cadastrado")
+    void salvarEndereco_quandoCadastradoComSucesso_entaoRetornaEndereco(){
         RequisicaoCadastroEndereco cadastroEndereco = new RequisicaoCadastroEndereco("AVENIDA", "GUIMARAES", 155, "CENTRO", "SAO PAULO", "SP");
         Cidade cidade = new Cidade("SAO PAULO", UF.SP);
         Endereco endereco = new Endereco(cadastroEndereco.tipoLogradouro(), cadastroEndereco.logradouro(), cadastroEndereco.numero(), cadastroEndereco.bairro(), cidade);
@@ -72,7 +75,8 @@ public class EnderecoServiceTest {
     }
 
     @Test
-    void deveAlterarTodasAsPropriedadesDeEndereco(){
+    @DisplayName("Deve alterar todos as propriedades do endereço e salvar a alteração com sucesso")
+    void alterarEndereco_quandoAlterarTodasAsPropriedades_entaoSalvaAlteracaoComSucesso(){
         Integer id = 1;
         Cidade cidade = new Cidade("SAO PAULO", UF.SP);
         Endereco endereco = new Endereco(id, "AVENIDA", "GUIMARAES", 155, "CENTRO", cidade);
@@ -94,7 +98,8 @@ public class EnderecoServiceTest {
     }
 
     @Test
-    void deveAlterarApenasTipoLogradouroDoEndereco(){
+    @DisplayName("Deve alterar apenas o TipoLogradouro do endereço e salvar a alteração com sucesso")
+    void alterarEndereco_quandoAlterarTipoLogradouro_entaoSalvaAlteracaoComSucesso(){ //so logradouro
         Integer id = 1;
         Cidade cidade = new Cidade("SAO PAULO", UF.SP);
         Endereco endereco = new Endereco(id, "AVENIDA", "GUIMARAES", 155, "CENTRO", cidade);
@@ -117,7 +122,8 @@ public class EnderecoServiceTest {
     }
 
     @Test
-    void deveAlterarApenasNumeroDoEndereco(){
+    @DisplayName("Deve alterar apenas o numero do endereço e salvar a alteração com sucesso")
+    void alterarEndereco_QuandoAlterarNumero_entaoSalvaAlteracaoComSucesso(){
         Integer id = 1;
         Cidade cidade = new Cidade("SAO PAULO", UF.SP);
         Endereco endereco = new Endereco(id, "AVENIDA", "GUIMARAES", 155, "CENTRO", cidade);
@@ -140,13 +146,14 @@ public class EnderecoServiceTest {
     }
 
     @Test
-    void deveAlterarTipoLogradouroELogradouroDoEndereco(){
+    @DisplayName("Deve alterar apenas o logradouro do endereço e salvar a alteração com sucesso")
+    void alterarEndereco_quandoAlterarLogradouro_entaoSalvaAlteracaoComSucesso(){
         Integer id = 1;
         Cidade cidade = new Cidade("SAO PAULO", UF.SP);
         Endereco endereco = new Endereco(id, "AVENIDA", "GUIMARAES", 155, "CENTRO", cidade);
         when(enderecoDao.selecionarEnderecoPorReferenciaDeId(id)).thenReturn(endereco);
 
-        RequisicaoAlteracaoEndereco requisicaoAlteracaoEndereco = new RequisicaoAlteracaoEndereco("RUA", "BEIJA-FLOR", null, null, null, null);
+        RequisicaoAlteracaoEndereco requisicaoAlteracaoEndereco = new RequisicaoAlteracaoEndereco(null, "BEIJA-FLOR", null, null, null, null);
 
         emTeste.alterarEndereco(id, requisicaoAlteracaoEndereco);
 
@@ -155,7 +162,7 @@ public class EnderecoServiceTest {
         verify(enderecoDao).alterarEndereco(enderecoArgumentCaptor.capture());
         Endereco enderecoCapturado = enderecoArgumentCaptor.getValue();
 
-        assertThat(enderecoCapturado.getTipoLogradouro()).isEqualTo(requisicaoAlteracaoEndereco.tipoLogradouro());
+        assertThat(enderecoCapturado.getTipoLogradouro()).isEqualTo(endereco.getTipoLogradouro());
         assertThat(enderecoCapturado.getLogradouro()).isEqualTo(requisicaoAlteracaoEndereco.logradouro());
         assertThat(enderecoCapturado.getNumero()).isEqualTo(endereco.getNumero());
         assertThat(enderecoCapturado.getBairro()).isEqualTo(endereco.getBairro());
@@ -163,7 +170,8 @@ public class EnderecoServiceTest {
     }
 
     @Test
-    void deveAlterarCidadeDoEndereco(){
+    @DisplayName("Deve alterar apenas a Cidade do endereço e salvar a alteração com sucesso")
+    void alterarEndereco_quandoAlterarCidade_entaoSalvaAlteracaoComSucesso(){
         Integer id = 1;
         Cidade cidade = new Cidade("SAO PAULO", UF.SP);
         Endereco endereco = new Endereco(id, "AVENIDA", "GUIMARAES", 155, "CENTRO", cidade);
@@ -191,7 +199,8 @@ public class EnderecoServiceTest {
     }
 
     @Test
-    void deveFalharAoTentarAlterarEnderecoComValoresIguais(){
+    @DisplayName("Deve falhar ao tentar alterar endereco com propriedades iguais as ja cadastradas")
+    void alterarEndereco_quandoPropriedadesForemIguais_entaoLancaExcecao(){
         Integer id = 1;
         Cidade cidade = new Cidade("SAO PAULO", UF.SP);
         Endereco endereco = new Endereco(id, "AVENIDA", "GUIMARAES", 155, "CENTRO", cidade);
@@ -205,7 +214,8 @@ public class EnderecoServiceTest {
     }
 
     @Test
-    void deveBuscarCidadeComSucesso(){
+    @DisplayName("Deve retornar Cidade quando cidade e uf existir")
+    void buscaCidade_quandoExistir_entaoRetornaCidade(){
         RequisicaoCadastroEndereco cadastroEndereco = new RequisicaoCadastroEndereco("AVENIDA", "GUIMARAES", 155, "CENTRO", "SAO PAULO", "SP");
 
         emTeste.buscaCidade(cadastroEndereco.cidade(), cadastroEndereco.uf());

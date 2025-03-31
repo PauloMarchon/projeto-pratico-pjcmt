@@ -2,6 +2,7 @@ package com.paulomarchon.projetopratico.pessoa;
 
 import com.paulomarchon.projetopratico.AbstractIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -29,7 +30,8 @@ public class PessoaRepositoryTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deveRetornarPessoaContendoNomeInformado() {
+    @DisplayName("Deve retornar os nomes correspondentes ao informado")
+    void findByNomeContainingIgnoreCase_quandoBuscadoPorNome_entaoRetornaNomesCorrespondentes() {
         Pessoa pessoa1 = new Pessoa("AFONSO SOUZA", LocalDate.now(), SexoPessoa.MASCULINO, "REGINA", "AFONSO");
         Pessoa pessoa2 = new Pessoa("MARCELO MEDINA", LocalDate.now(), SexoPessoa.MASCULINO, "REGINA", "AFONSO");
         Pessoa pessoa3 = new Pessoa("MARCELO FERNANDES", LocalDate.now(), SexoPessoa.MASCULINO, "REGINA", "AFONSO");

@@ -5,10 +5,12 @@ import com.paulomarchon.projetopratico.endereco.EnderecoService;
 import com.paulomarchon.projetopratico.endereco.dto.RequisicaoAlteracaoEndereco;
 import com.paulomarchon.projetopratico.endereco.dto.RequisicaoCadastroEndereco;
 import com.paulomarchon.projetopratico.exception.RecursoNaoEncontradoException;
+import com.paulomarchon.projetopratico.foto.FotoPessoaService;
 import com.paulomarchon.projetopratico.pessoa.dto.PessoaDto;
 import com.paulomarchon.projetopratico.pessoa.dto.RequisicaoAlteracaoPessoa;
 import com.paulomarchon.projetopratico.pessoa.dto.RequisicaoCadastroPessoa;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -33,6 +35,8 @@ public class PessoaServiceTest {
     private PessoaDao pessoaDao;
     @Mock
     private EnderecoService enderecoService;
+    @Mock
+    private FotoPessoaService fotoPessoaService;
     private PessoaService emTeste;
     private final PessoaDtoMapper pessoaDtoMapper = new PessoaDtoMapper();
 
@@ -42,7 +46,7 @@ public class PessoaServiceTest {
 
     @BeforeEach
     void setUp() {
-        emTeste = new PessoaService(pessoaDao, pessoaDtoMapper, enderecoService);
+        emTeste = new PessoaService(pessoaDao, pessoaDtoMapper, fotoPessoaService ,enderecoService);
 
         Endereco endereco1 = new Endereco(1,"RUA", "SAO JOSE", 20, "VILA NOVA", null);
 
@@ -53,7 +57,8 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveBuscarTodasPessoas() {
+    @DisplayName("buscarTodasPessoas: Deve retornar todas as pessoas de forma paginada")
+    void buscarTodasPessoas_quandoChamado_entaoRetornaTodasPessoasPaginadas() {
         int pagina = 0;
         int tamanho = 10;
         Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("nome"));
@@ -75,7 +80,8 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveBuscarPessoaPorNome() {
+    @DisplayName("buscarPessoaPorNome: Deve retornar as pessoas com nome correspondente de forma paginada")
+    void buscarPessoaPorNome_quandoNomeCorresponder_entaoRetornaPessoasPaginadas() {
         int pagina = 0;
         int tamanho = 10;
         String nome = "MARCELO";
@@ -96,7 +102,8 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveBuscarPessoaPorNomeVazioPorNaoObterCorrespondencia() {
+    @DisplayName("buscarPessoaPorNome: Deve retornar pagina vazia quando nenhum nome corresponder")
+    void buscarPessoaPorNome_quandoNomeNaoCorresponder_entaoRetornaPaginaVazia() {
         int pagina = 0;
         int tamanho = 10;
         String nome = "LUDMILLA";
@@ -115,7 +122,8 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveCadastrarPessoaCorretamente() {
+    @DisplayName("Deve efetuar o cadastro da pessoa com sucesso")
+    void cadastrarPessoa_quandoChamado_entaoCadastraPessoaComSucesso() {
         LocalDate dataNascimento = LocalDate.now();
         RequisicaoCadastroPessoa cadastroPessoa = new RequisicaoCadastroPessoa("MARCELO FERNANDES", dataNascimento, SexoPessoa.MASCULINO, "REGINA", "AFONSO");
         when(pessoaDao.cadastrarPessoa(any(Pessoa.class))).thenReturn(pessoa1);
@@ -136,7 +144,8 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveRetornarPessoaCadastradaCorretamente() {
+    @DisplayName("Deve retornar a pessoa cadastrada com sucesso como PessoaDto")
+    void cadastrarPessoa_quandoSucesso_entaoRetornaPessoaDtoCadastrada() {
         LocalDate dataNascimento = LocalDate.now();
         RequisicaoCadastroPessoa cadastroPessoa = new RequisicaoCadastroPessoa("MARCELO FERNANDES", dataNascimento, SexoPessoa.MASCULINO, "REGINA", "AFONSO");
         Pessoa pessoa = new Pessoa(
@@ -164,9 +173,10 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveAlterarTodasAsPropriedadesDePessoa() {
+    @DisplayName("Deve alterar todas as propriedades de pessoa e salvar as alteracoes com sucesso")
+    void alterarPessoa_quandoAlterarTodasPropriedades_entaoSalvaAlteracaoComSucesso() {
         Integer id = 1;
-        when(pessoaDao.buscarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
+        when(pessoaDao.selecionarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
 
         LocalDate dataNascimento = LocalDate.now();
         RequisicaoAlteracaoPessoa alteracaoPessoa = new RequisicaoAlteracaoPessoa("ROBERTA SOUZA", dataNascimento, SexoPessoa.FEMININO, "LETICIA", "MARCOS");
@@ -186,9 +196,10 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveAlterarSomenteNomeDePessoa() {
+    @DisplayName("Deve alterar apenas o nome da pessoa e salvar a alteracao com sucesso")
+    void alterarPessoa_quandoAlterarNome_entaoSalvaAlteracaoComSucesso() {
         Integer id = 1;
-        when(pessoaDao.buscarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
+        when(pessoaDao.selecionarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
 
         RequisicaoAlteracaoPessoa alteracaoPessoa = new RequisicaoAlteracaoPessoa("RONALDO", null, null, null, null);
 
@@ -207,10 +218,11 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveAlterarSomenteDataDeNascimentoDePessoa() {
+    @DisplayName("Deve alterar apenas data de nascimento de pessoa e salvar a alteracao com sucesso")
+    void alterarPessoa_quandoAlterarDataDeNascimento_entaoSalvaAlteracaoComSucesso() {
         Integer id = 1;
         LocalDate dataNascimento = LocalDate.of(1990, 10, 12);
-        when(pessoaDao.buscarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
+        when(pessoaDao.selecionarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
 
         RequisicaoAlteracaoPessoa alteracaoPessoa = new RequisicaoAlteracaoPessoa(null, dataNascimento, null, null, null);
 
@@ -229,9 +241,10 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveAlterarSomenteSexoDePessoa() {
+    @DisplayName("Deve alterar apenas o sexo da pessoa e salvar a alteracao com sucesso")
+    void alterarPessoa_quandoAlterarSexo_entaoSalvaAlteracaoComSucesso() {
         Integer id = 1;
-        when(pessoaDao.buscarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
+        when(pessoaDao.selecionarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
 
         RequisicaoAlteracaoPessoa alteracaoPessoa = new RequisicaoAlteracaoPessoa(null, null, SexoPessoa.FEMININO, null, null);
 
@@ -250,9 +263,10 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveAlterarSomenteNomeDaMaeDePessoa() {
+    @DisplayName("Deve alterar apenas o nome da mae da pessoa e salvar a alteracao com sucesso")
+    void alterarPessoa_quandoAlterarNomeMae_entaoSalvaAlteracaoComSucesso() {
         Integer id = 1;
-        when(pessoaDao.buscarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
+        when(pessoaDao.selecionarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
 
         RequisicaoAlteracaoPessoa alteracaoPessoa = new RequisicaoAlteracaoPessoa(null, null, null, "MARIA", null);
 
@@ -271,9 +285,10 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveAlterarSomenteNomeDoPaiDePessoa() {
+    @DisplayName("Deve alterar apenas o nome do pai da pessoa e salva a alteracao com sucesso")
+    void alterarPessoa_quandoAlterarNomePai_entaoSalvaAlteracaoComSucesso() {
         Integer id = 1;
-        when(pessoaDao.buscarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
+        when(pessoaDao.selecionarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
 
         RequisicaoAlteracaoPessoa alteracaoPessoa = new RequisicaoAlteracaoPessoa(null, null, null, null, "JOSE");
 
@@ -292,9 +307,10 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveCadastrarEnderecoDePessoaCorretamente() {
+    @DisplayName("Deve cadastrar o endereco de Pessoa com sucesso quando pessoa existir")
+    void cadastrarEnderecoDePessoa_quandoPessoaExistir_entaoCadastraEnderecoComSucesso() {
         Integer id = 1;
-        when(pessoaDao.buscarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
+        when(pessoaDao.selecionarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
 
         RequisicaoCadastroEndereco cadastroEndereco = new RequisicaoCadastroEndereco("RUA", "SAO JOSE", 20, "VILA NOVA", "SAO PAULO", "SP");
 
@@ -316,9 +332,10 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveAlterarEnderecoDePessoa() {
+    @DisplayName("Deve alterar o endereco de Pessoa com sucesso quando pessoa existir")
+    void alterarEnderecoDePessoa_quandoPessoaExistir_entaoAlteraEnderecoComSucesso() {
         Integer id = 1;
-        when(pessoaDao.buscarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
+        when(pessoaDao.selecionarPessoaPorReferenciaDeId(id)).thenReturn(pessoa1);
 
         RequisicaoAlteracaoEndereco requisicaoAlteracaoEndereco = new RequisicaoAlteracaoEndereco("RUA", "SAO JOSE", 20, "VILA NOVA", null, null);
 
@@ -336,7 +353,8 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveExcluirPessoaComSucesso() {
+    @DisplayName("excluirPessoa: Deve excluir Pessoa com sucesso quando ID informado existir")
+    void excluirPessoa_quandoIdExistir_entaoExcluiPessoaComSucesso() {
         Integer id = 1;
 
         when(pessoaDao.existePessoa(id)).thenReturn(true);
@@ -347,7 +365,8 @@ public class PessoaServiceTest {
     }
 
     @Test
-    void deveFalharAoTentarExcluirPessoaComIdInexistente() {
+    @DisplayName("excluirPessoa: Deve lancar excecao quando ID informado nao existir")
+    void excluirPessoa_quandoIdNaoExistir_entaoLancaExcecao() {
         Integer id = 1;
 
         when(pessoaDao.existePessoa(id)).thenReturn(false);

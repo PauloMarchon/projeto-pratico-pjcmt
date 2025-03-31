@@ -1,6 +1,7 @@
 package com.paulomarchon.projetopratico.cidade;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -26,7 +27,8 @@ public class CadastroCidadeServiceTest {
     }
 
     @Test
-    void deveCadastrarUmaNovaCidadeCorretamente(){
+    @DisplayName("Deve cadastrar uma nova cidade com sucesso")
+    void cadastrarNovaCidade_ComSucesso(){
        String nome = "RIO DE JANEIRO";
        UF uf = UF.RJ;
 
@@ -44,7 +46,8 @@ public class CadastroCidadeServiceTest {
     }
 
     @Test
-    void deveRetornarNovaCidadeCadastradaCorretamente(){
+    @DisplayName("Deve retornar a nova cidade cadastrada")
+    void cadastrarNovaCidade_QuandoCadastradoComSucesso_entaoRetornaCidade(){
         String nome = "RIO DE JANEIRO";
         UF uf = UF.RJ;
         Cidade cidade = new Cidade(nome, uf);

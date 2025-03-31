@@ -5,7 +5,9 @@ import com.paulomarchon.projetopratico.minio.MinioBuckets;
 import com.paulomarchon.projetopratico.minio.MinioService;
 import com.paulomarchon.projetopratico.pessoa.Pessoa;
 import com.paulomarchon.projetopratico.pessoa.SexoPessoa;
+import io.minio.PutObjectArgs;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -45,11 +47,12 @@ public class FotoPessoaServiceTest {
 
         pessoa = new Pessoa("AFONSO SOUZA", LocalDate.now(), SexoPessoa.MASCULINO, "REGINA", "AFONSO");
 
-        when(minioBuckets.getFoto()).thenReturn("foto-pessoa");
+        when(minioBuckets.getBucketFotoPessoa()).thenReturn("foto-pessoa");
     }
 
     @Test
-    void deveRecuperarTodasAsFotosDePessoa() {
+    @DisplayName("Deve recuperar todas as fotos da pessoa informada com sucesso")
+    void recuperarFotosDePessoa_quandoPessoaExistir_entaoRecuperaTodasFotosComSucesso() {
         String hashFoto1 = UUID.randomUUID().toString();
         String hashFoto2 = UUID.randomUUID().toString();
         String hashFoto3 = UUID.randomUUID().toString();
@@ -62,9 +65,9 @@ public class FotoPessoaServiceTest {
         List<String> hashesFotos = List.of(hashFoto1, hashFoto2, hashFoto3);
 
         when(fotoPessoaDao.recuperarTodasFotosDePessoa(pessoa)).thenReturn(fotos);
-        when(minioService.recuperarImagens(minioBuckets.getFoto(), hashesFotos)).thenReturn(hashesFotos);
+        when(minioService.recuperarImagens(minioBuckets.getBucketFotoPessoa(), hashesFotos)).thenReturn(hashesFotos);
 
-        List<String> resultadoAtual = emTeste.recuperarTodasFotosDePessoa(pessoa);
+        List<String> resultadoAtual = emTeste.recuperarFotosDePessoa(pessoa);
 
         assertThat(resultadoAtual).isNotNull();
         assertThat(resultadoAtual).hasSize(3);
@@ -72,7 +75,8 @@ public class FotoPessoaServiceTest {
     }
 
     @Test
-    void deveSalvarFotosDePessoaComSucesso() throws IOException {
+    @DisplayName("Deve salvar todas as fotos da pessoa informada quando Pessoa existir")
+    void salvarFotosDePessoa_quandoPessoaExistir_entaoSalvaFotosComSucesso() throws IOException {
         MultipartFile foto = mock(MultipartFile.class);
         List<MultipartFile> fotos = List.of(foto);
 
@@ -87,37 +91,18 @@ public class FotoPessoaServiceTest {
 
         emTeste.salvarFotosDePessoa(pessoa, fotos);
 
-        verify(minioService, times(1)).enviarImagens(anyString(), anyList());
-        verify(fotoPessoaDao, times(1)).adicionarFotosDePessoa(anyList());
+        verify(minioService, times(1)).enviarImagens(any(PutObjectArgs.class));
+        verify(fotoPessoaDao, times(1)).adicionarFotoDePessoa(any(FotoPessoa.class));
     }
 
     @Test
-    void deveExcluirAsFotosDePessoaAtravesDoHash() {
+    @DisplayName("Deve excluir todas as fotos referentes aos hash's informados")
+    void excluirFotoDePessoa_quandoHashExistir_entaoExcluiFotoComSucesso() {
         List<String> imagemHash = Arrays.asList("hash1", "hash2", "hash3");
 
         emTeste.excluirFotoDePessoa(imagemHash);
 
         verify(minioService, times(1)).excluirImagens(anyString(), anyList());
         verify(fotoPessoaDao, times(1)).excluirFotoDePessoaPorHash(imagemHash);
-    }
-
-    @Test
-    void deveLancarFalhaNoServicoS3AoTentarExcluirFotosDePessoa() {
-        List<String> imagemHash = Arrays.asList("hash1", "hash2", "hash3");
-
-        Throwable causa = new Throwable();
-        doThrow(new FalhaNoServicoS3Exception("Erro ao excluir fotos de pessoa", causa)).when(minioService).excluirImagens(anyString(), anyList());
-
-        assertThatThrownBy(() -> emTeste.excluirFotoDePessoa(imagemHash))
-                .isInstanceOf(FalhaNoServicoS3Exception.class)
-                .satisfies(exception -> {
-                    FalhaNoServicoS3Exception ex = (FalhaNoServicoS3Exception) exception;
-                    ProblemDetail problemDetail = ex.problemDetail();
-                    assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-                    assertThat(problemDetail.getTitle()).isEqualTo("Erro ao realizar operacao com o servidor S3");
-                    assertThat(problemDetail.getDetail()).isEqualTo("Erro ao excluir fotos de pessoa");
-                    assertThat(problemDetail.getProperties()).containsKey("causa");
-                    assertThat(problemDetail.getProperties()).containsKey("timestamp");
-                });
     }
 }

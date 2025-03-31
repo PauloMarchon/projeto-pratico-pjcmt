@@ -29,7 +29,8 @@ public class CidadeServiceTest {
     }
 
     @Test
-    void deveBuscarCidadeAoReceberUmaRequisicaoDeUmaCidadeExistente(){
+    @DisplayName("Deve retornar Cidade quando cidade informada ja for cadastrada")
+    void processaRequisicaoDeCidade_quandoCidadeExistir_entaoRetornaCidade(){
         Integer id = 1;
         RequisicaoCadastroCidade requisicao = new RequisicaoCadastroCidade("rio de janeiro", "rj");
         UF uf = emTeste.obtemUFInformado(requisicao.uf());
@@ -51,7 +52,8 @@ public class CidadeServiceTest {
     }
 
     @Test
-    void deveChamarServicoDeCadastroAoReceberUmaRequisicaoDeUmaCidadeNaoCadastrada(){
+    @DisplayName("Deve cadastrar nova Cidade quando cidade informada nao existir")
+    void processaRequisicaoDeCidade_quandoCidadeNaoExistir_entaoCadastraNovaCidade(){
         RequisicaoCadastroCidade requisicao = new RequisicaoCadastroCidade("rio de janeiro", "rj");
         UF uf = emTeste.obtemUFInformado(requisicao.uf());
 
@@ -62,7 +64,8 @@ public class CidadeServiceTest {
     }
 
     @Test
-    void obtemUFInformadoComSucesso(){
+    @DisplayName("Deve retornar UF informada quando UF informada existir")
+    void obtemUFInformado_quandoUfExistir_entaoRetornarUfComSucesso(){
         RequisicaoCadastroCidade requisicao = new RequisicaoCadastroCidade("rio de janeiro", "rj");
 
         UF resultadoAtual = emTeste.obtemUFInformado(requisicao.uf());
@@ -71,7 +74,8 @@ public class CidadeServiceTest {
     }
 
     @Test
-    void falhaAoTentarObterUFInexistente(){
+    @DisplayName("Deve lancar excecao caso UF informada nao existir")
+    void obtemUFInformado_quandoUfNaoExistir_entaoLancaExcecao(){
         RequisicaoCadastroCidade requisicao = new RequisicaoCadastroCidade("rio de janeiro", "aa");
 
         assertThatThrownBy(() -> emTeste.obtemUFInformado(requisicao.uf()))

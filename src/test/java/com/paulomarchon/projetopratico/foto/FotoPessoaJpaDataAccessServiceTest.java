@@ -25,8 +25,7 @@ public class FotoPessoaJpaDataAccessServiceTest {
     private Pessoa pessoa;
     private FotoPessoa fotoPessoa1;
     private FotoPessoa fotoPessoa2;
-    private FotoPessoa fotoPessoa3;
-    private List<FotoPessoa> fotos;
+
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -36,8 +35,6 @@ public class FotoPessoaJpaDataAccessServiceTest {
         pessoa = new Pessoa("AFONSO SOUZA", LocalDate.now(), SexoPessoa.MASCULINO, "REGINA", "AFONSO");
         fotoPessoa1 = new FotoPessoa(pessoa, LocalDate.now(), "foto", UUID.randomUUID().toString());
         fotoPessoa2 = new FotoPessoa(pessoa, LocalDate.now(), "foto", UUID.randomUUID().toString());
-        fotoPessoa3 = new FotoPessoa(pessoa, LocalDate.now(), "foto", UUID.randomUUID().toString());
-        fotos = List.of(fotoPessoa1, fotoPessoa2, fotoPessoa3);
     }
 
     @AfterEach
@@ -46,7 +43,8 @@ public class FotoPessoaJpaDataAccessServiceTest {
     }
 
     @Test
-    void deveRecuperarTodasAsFotosDeUmaPessoa() {
+    void recuperarTodasFotosDePessoa() {
+        List<FotoPessoa> fotos = List.of(fotoPessoa1, fotoPessoa2);
         when(fotoPessoaRepository.findAllByPessoa(pessoa)).thenReturn(fotos);
 
         List<FotoPessoa> resultadoAtual = emTeste.recuperarTodasFotosDePessoa(pessoa);
@@ -57,16 +55,16 @@ public class FotoPessoaJpaDataAccessServiceTest {
     }
 
     @Test
-    void deveAdicionarFotosDePessoa() {
-        when(fotoPessoaRepository.saveAll(anyList())).thenReturn(List.of(fotoPessoa1, fotoPessoa2));
+    void adicionarFotoDePessoa() {
+        when(fotoPessoaRepository.save(fotoPessoa1)).thenReturn(fotoPessoa1);
 
-        emTeste.adicionarFotosDePessoa(fotos);
+        emTeste.adicionarFotoDePessoa(fotoPessoa1);
 
-        verify(fotoPessoaRepository).saveAll(fotos);
+        verify(fotoPessoaRepository).save(fotoPessoa1);
     }
 
     @Test
-    void deveExcluirFotoDePessoaPorHash() {
+    void excluirFotoDePessoaPorHash() {
         List<String> hashes = List.of("hash1", "hash2");
 
         doNothing().when(fotoPessoaRepository).deleteAllByHashIn(hashes);

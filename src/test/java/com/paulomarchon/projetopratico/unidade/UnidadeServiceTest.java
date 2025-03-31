@@ -12,6 +12,7 @@ import com.paulomarchon.projetopratico.unidade.dto.RequisicaoAlteracaoUnidade;
 import com.paulomarchon.projetopratico.unidade.dto.RequisicaoCadastroUnidade;
 import com.paulomarchon.projetopratico.unidade.dto.UnidadeDto;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -58,7 +59,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveBuscarTodasUnidades(){
+    @DisplayName("Deve retorna todas as unidades cadastradas de forma paginada")
+    void buscarTodasUnidades_quandoChamado_entaoRetornaTodasUnidadesPaginadas() {
         int numeroPagina = 0;
         int quantResultados = 2;
         Pageable paginacao = PageRequest.of(numeroPagina, quantResultados, Sort.by("sigla").and(Sort.by("nome")));
@@ -88,7 +90,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveSelecionarUnidadePorId(){
+    @DisplayName("selecionarUnidadePorId: Deve retornar UnidadeDto quando ID da unidade existir")
+    void selecionarUnidadePorId_quandoIdExistir_entaoRetornaUnidadeDto(){
         Integer id = 1;
 
         when(unidadeDao.selecionarUnidadePorId(id)).thenReturn(Optional.of(unidade1));
@@ -101,7 +104,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveFalharAoTentarSelecionarUnidadeComIdInexistente(){
+    @DisplayName("selecionarUnidadePorId: Deve lancar excecao quando ID da unidade nao existir")
+    void selecionarUnidadePorId_quandoIdNaoExistir_entaoLancaExcecao(){
         Integer id = 1;
 
         when(unidadeDao.selecionarUnidadePorId(id)).thenReturn(Optional.empty());
@@ -119,7 +123,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveCadastrarUnidadeCorretamente(){
+    @DisplayName("Deve cadastrar uma nova unidade com sucesso")
+    void cadastrarUnidade_quandoInformado_entaoCadastraUnidadeComSucesso(){
         RequisicaoCadastroEndereco requisicaoEndereco = new RequisicaoCadastroEndereco("AVENIDA", "GUIMARAES", 155, "CENTRO", "SAO PAULO", "SP");
         RequisicaoCadastroUnidade requisicaoUnidade = new RequisicaoCadastroUnidade("UNIDADE PRIMEIRA", "UP", requisicaoEndereco);
 
@@ -145,7 +150,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveRetornarUnidadeCadastrada(){
+    @DisplayName("Deve retornar a unidade cadastrada como UnidadeDto")
+    void cadastrarUnidade_quandoCadastradaComSucesso_entaoRetornaUnidadeDto(){
         RequisicaoCadastroEndereco requisicaoEndereco = new RequisicaoCadastroEndereco("AVENIDA", "GUIMARAES", 155, "CENTRO", "SAO PAULO", "SP");
         RequisicaoCadastroUnidade requisicaoUnidade = new RequisicaoCadastroUnidade("UNIDADE PRIMEIRA", "UP", requisicaoEndereco);
 
@@ -160,7 +166,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveAlterarTodasAsPropriedadesDaUnidade(){
+    @DisplayName("Deve alterar todas as propriedades da Unidade e salvar as alteracoes")
+    void alterarUnidade_quandoAlterarTodasPropriedades_entaoSalvaAlteracaoComSucesso(){
         Integer id = 1;
         when(unidadeDao.selecionarUnidadePorId(id)).thenReturn(Optional.of(unidade1));
 
@@ -181,7 +188,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveAlterarSomenteNomeDaUnidade(){
+    @DisplayName("Deve alterar apenas o nome da Unidade e salvar as alteracoes")
+    void alterarUnidade_quandoAlterarNome_entaoSalvaAlteracaoComSucesso(){
         Integer id = 1;
         when(unidadeDao.selecionarUnidadePorId(id)).thenReturn(Optional.of(unidade1));
 
@@ -203,7 +211,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveAlterarSomenteSiglaDaUnidade(){
+    @DisplayName("Deve alterar apenas a sigla da Unidade e salvar as alteracoes")
+    void alterarUnidade_quandoAlterarSigla_entaoSalvaAlteracaoComSucesso(){
         Integer id = 1;
         when(unidadeDao.selecionarUnidadePorId(id)).thenReturn(Optional.of(unidade1));
 
@@ -225,7 +234,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveAlterarEnderecoDaUnidade(){
+    @DisplayName("Deve alterar apenas o endereco da Unidade e salvar a alteracao")
+    void alterarUnidade_quandoAlterarEndereco_entaoSalvaAlteracaoComSucesso(){
         Integer id = 1;
         RequisicaoAlteracaoEndereco alteracaoEndereco = new RequisicaoAlteracaoEndereco("VILA", "NOVA ESPERANCA", 99, "OLARIA", null, null);
         RequisicaoAlteracaoUnidade alteracaoUnidade = new RequisicaoAlteracaoUnidade(null, null, alteracaoEndereco);
@@ -240,7 +250,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveExcluirUnidade(){
+    @DisplayName("excluirUnidade: Deve excluir unidade quando ID informado existir")
+    void excluirUnidade_quandoIdExistir_entaoExcluiUnidadeComSucesso(){
         Integer id = 1;
 
         when(unidadeDao.existeUnidade(id)).thenReturn(true);
@@ -251,7 +262,8 @@ public class UnidadeServiceTest {
     }
 
     @Test
-    void deveFalharAoTentarExcluirUnidadeIdInexistente(){
+    @DisplayName("excluirUnidade: Deve lancar excecao quando ID informado nao existir")
+    void excluirUnidade_quandoIdNaoExistir_entaoLancaExcecao(){
         Integer id = 1;
 
         when(unidadeDao.existeUnidade(id)).thenReturn(false);

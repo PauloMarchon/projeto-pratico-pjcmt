@@ -5,6 +5,7 @@ import com.paulomarchon.projetopratico.pessoa.Pessoa;
 import com.paulomarchon.projetopratico.pessoa.PessoaRepository;
 import com.paulomarchon.projetopratico.pessoa.SexoPessoa;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -35,7 +36,8 @@ public class FotoPessoaRepositoryTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deveRetornarTodasAsFotosBuscandoPorPessoa() throws Exception {
+    @DisplayName("Deve retornar todas as fotos caso a pessoa exista")
+    void findAllByPessoa_quandoPessoaExistir_entaoRetornaAsFotosComSucesso() throws Exception {
         pessoa = new Pessoa("AFONSO SOUZA", LocalDate.now(), SexoPessoa.MASCULINO, "REGINA", "AFONSO");
         pessoaRepository.save(pessoa);
 
@@ -53,7 +55,8 @@ public class FotoPessoaRepositoryTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deveDeletarTodasAsFotosComOsHashesInformados() {
+    @DisplayName("Deve deletar todas as fotos com os hash's informados")
+    void deleteAllByHashIn_quandoHashExistir_entaoDeletaAsFotosInformadasComSucesso() {
         pessoa = new Pessoa("AFONSO SOUZA", LocalDate.now(), SexoPessoa.MASCULINO, "REGINA", "AFONSO");
         pessoaRepository.save(pessoa);
 

@@ -7,6 +7,7 @@ import com.paulomarchon.projetopratico.unidade.dto.UnidadeDto;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,8 +34,9 @@ public class UnidadeControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisplayName("listarUnidades: Deve retornas todas as unidades cadastradas como UnidadeDto de forma paginada")
     @Sql("/dados/dados_de_teste_unidade.sql")
-    void deveRetornarUnidadesPaginadas(){
+    void listarUnidades_quandoChamado_entaoRetornaPaginaComTodasUnidadesComoUnidadeDto() {
         given().contentType(ContentType.JSON)
                 .when()
                 .get("/api/v1/unidades?pag=0&results=10")
@@ -49,7 +51,8 @@ public class UnidadeControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deveRetornarUmaUnidadePorId(){
+    @DisplayName("buscarUnidade: Deve retornar Status 200 com UnidadeDto no corpo da requisicao caso ID existir")
+    void buscarUnidade_quandoIdExistir_entaoRetornaStatus200ComUnidadeDto(){
         RequisicaoCadastroEndereco requisicaoEndereco = new RequisicaoCadastroEndereco("AVENIDA", "GUIMARAES", 155, "CENTRO", "SAO PAULO", "SP");
         RequisicaoCadastroUnidade cadastroUnidade = new RequisicaoCadastroUnidade("UNIDADE DE TESTE PRIMEIRA", "UTP", requisicaoEndereco);
 
@@ -66,7 +69,8 @@ public class UnidadeControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deveRetornarError404UnidadeComIdInexistente(){
+    @DisplayName("buscarUnidade: Deve retornar Status 404 quando ID nao existir")
+    void buscarUnidade_quandoIdNaoExistir_entaoRetornaStatus404() {
         Integer id = 9999;
 
         given().contentType(ContentType.JSON)
@@ -77,7 +81,8 @@ public class UnidadeControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deveCadastrarNovaUnidadeComSucesso(){
+    @DisplayName("cadastrarUnidade: Deve retornar Status 201 com UnidadeDto cadastrada no corpo da requisicao")
+    void cadastrarUnidade_quandoValidado_entaoRetornaStatus201ComUnidadeCadastrada() {
         RequisicaoCadastroEndereco requisicaoEndereco = new RequisicaoCadastroEndereco("AVENIDA", "GUIMARAES", 155, "CENTRO", "SAO PAULO", "SP");
         RequisicaoCadastroUnidade cadastroUnidade = new RequisicaoCadastroUnidade("UNIDADE TESTE SEGUNDA", "UTS", requisicaoEndereco);
 
@@ -108,7 +113,8 @@ public class UnidadeControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deveAlterarUnidadeComSucesso(){
+    @DisplayName("atualizarUnidade: Deve retornar Status 200 quando ID da unidade a ser atualizada existir")
+    void atualizarUnidade_quandoIdExistir_entaoRetornaStatus200(){
         RequisicaoCadastroEndereco requisicaoEndereco = new RequisicaoCadastroEndereco("AVENIDA", "GUIMARAES", 155, "CENTRO", "SAO PAULO", "SP");
         RequisicaoCadastroUnidade cadastroUnidade = new RequisicaoCadastroUnidade("UNIDADE TESTE TERCEIRA", "UTT", requisicaoEndereco);
 
@@ -130,7 +136,8 @@ public class UnidadeControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deveDeletarUnidadeComSucesso(){
+    @DisplayName("excluirUnidade: Deve retornar Status 204 quando ID informado existir")
+    void excluirUnidade_quandoIdExistir_entaoRetornaStatus204(){
         RequisicaoCadastroEndereco requisicaoEndereco = new RequisicaoCadastroEndereco("AVENIDA", "GUIMARAES", 155, "CENTRO", "SAO PAULO", "SP");
         RequisicaoCadastroUnidade cadastroUnidade = new RequisicaoCadastroUnidade("UNIDADE TESTE QUARTA", "UTQ", requisicaoEndereco);
 
@@ -144,7 +151,8 @@ public class UnidadeControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void deveRetornarError404AoTentarExcluirUnidadeComIdInexistente(){
+    @DisplayName("excluirUnidade: Deve retornar Status 404 quando ID informado nao existir")
+    void excluirUnidade_quandoIdNaoExistir_entaoRetornaStatus404(){
         Integer id = 8888;
 
         given().contentType(ContentType.JSON)

@@ -69,12 +69,12 @@ public class PessoaJpaDataAccessServiceTest {
     }
 
     @Test
-    void buscarPessoaPorReferenciaDeId() {
+    void selecionarPessoaPorReferenciaDeId() {
         Integer id = 1;
         Pessoa pessoa = new Pessoa(id,"PAULO", LocalDate.now(), SexoPessoa.MASCULINO, "REGINA", "AFONSO");
         when(pessoaRepository.getReferenceById(id)).thenReturn(pessoa);
 
-        Pessoa resultadoAtual = emTeste.buscarPessoaPorReferenciaDeId(id);
+        Pessoa resultadoAtual = emTeste.selecionarPessoaPorReferenciaDeId(id);
 
         assertThat(resultadoAtual.getNome()).isEqualTo(pessoa.getNome());
 
@@ -117,7 +117,7 @@ public class PessoaJpaDataAccessServiceTest {
 
 
     @Test
-    void verificaSeExistePessoaRetornandoTrue() {
+    void verificaSeExistePessoa_quandoPessoaExistir() {
         Integer id = 1;
         when(pessoaRepository.existsById(id)).thenReturn(true);
 
@@ -129,7 +129,7 @@ public class PessoaJpaDataAccessServiceTest {
     }
 
     @Test
-    void verificaSeExistePessoaRetornandoFalse() {
+    void verificaSeExistePessoa_quandoPessoaNaoExistir() {
         Integer id = 1;
         when(pessoaRepository.existsById(id)).thenReturn(false);
 

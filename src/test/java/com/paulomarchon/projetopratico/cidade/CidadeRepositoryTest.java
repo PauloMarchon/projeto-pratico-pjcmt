@@ -1,6 +1,7 @@
 package com.paulomarchon.projetopratico.cidade;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -25,7 +26,8 @@ public class CidadeRepositoryTest {
     }
 
     @Test
-    void deveRetornarCidadePorNomeEUF() {
+    @DisplayName("Deve retornar Cidade com sucesso quando Nome e Uf informados existir")
+    void findByNomeIgnoreCaseAndUf_quandoCidadeUfExistir_entaoDeveRetornarComSucesso() {
         Cidade c1 = new Cidade("SAO PAULO", UF.SP);
         cidadeRepository.save(c1);
 
@@ -35,9 +37,10 @@ public class CidadeRepositoryTest {
         assertThat(cidade.get().getNome()).isEqualTo("SAO PAULO");
         assertThat(cidade.get().getUf()).isEqualTo(UF.SP);
     }
-
+    //salvarFotos_quandoPessoaNaoEncontrada_entaoLancaExcecao
     @Test
-    void deveRetornarNuloAoBuscarUmaCidadePorNomeEUFNaoCadastrada() {
+    @DisplayName("Deve retornar vazio quando Cidade com Nome e Uf informados nao existir")
+    void findByNomeIgnoreCaseAndUf_quandoCidadeUfNaoExistir_entaoDeveRetornarVazio() {
         Optional<Cidade> cidade = cidadeRepository.findByNomeIgnoreCaseAndUf("sao paulo", UF.SP);
 
         assertThat(cidade.isEmpty()).isTrue();
