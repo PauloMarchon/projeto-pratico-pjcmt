@@ -1,6 +1,5 @@
 package com.paulomarchon.projetopratico.foto;
 
-import com.paulomarchon.projetopratico.exception.FalhaNoServicoS3Exception;
 import com.paulomarchon.projetopratico.minio.MinioBuckets;
 import com.paulomarchon.projetopratico.minio.MinioService;
 import com.paulomarchon.projetopratico.pessoa.Pessoa;
@@ -10,14 +9,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -37,9 +37,7 @@ public class FotoPessoaServiceTest {
     @Mock
     private MinioService minioService;
     private FotoPessoaService emTeste;
-
     private Pessoa pessoa;
-    private List<MultipartFile> fotos;
 
     @BeforeEach
     void setUp() {
@@ -77,22 +75,37 @@ public class FotoPessoaServiceTest {
     @Test
     @DisplayName("Deve salvar todas as fotos da pessoa informada quando Pessoa existir")
     void salvarFotosDePessoa_quandoPessoaExistir_entaoSalvaFotosComSucesso() throws IOException {
-        MultipartFile foto = mock(MultipartFile.class);
-        List<MultipartFile> fotos = List.of(foto);
+        MultipartFile fotoMock = mock(MultipartFile.class);
+        String conteudoDaFoto = UUID.randomUUID().toString();
+        InputStream inputStream = new ByteArrayInputStream(conteudoDaFoto.getBytes());
 
-        String hash = UUID.randomUUID().toString();
+        when(fotoMock.getInputStream()).thenReturn(inputStream);
+        when(fotoMock.getSize()).thenReturn((long) conteudoDaFoto.getBytes().length);
+        when(fotoMock.getContentType()).thenReturn("image/jpeg");
 
-        when(minioBuckets.getFoto()).thenReturn(hash);
-        when(foto.getBytes()).thenReturn("conteudo".getBytes());
-        when(foto.getSize()).thenReturn((long) "conteudo".length());
-
-        doNothing().when(minioService).enviarImagens(anyString(), anyList());
-        doNothing().when(fotoPessoaDao).adicionarFotosDePessoa(anyList());
+        MultipartFile[] fotos = new MultipartFile[]{fotoMock};
 
         emTeste.salvarFotosDePessoa(pessoa, fotos);
 
-        verify(minioService, times(1)).enviarImagens(any(PutObjectArgs.class));
-        verify(fotoPessoaDao, times(1)).adicionarFotoDePessoa(any(FotoPessoa.class));
+        //FotoPessoaDao
+        ArgumentCaptor<FotoPessoa> fotoPessoaArgumentCaptor = ArgumentCaptor.forClass(FotoPessoa.class);
+        verify(fotoPessoaDao).adicionarFotoDePessoa(fotoPessoaArgumentCaptor.capture());
+        FotoPessoa fotoPessoaCapturada = fotoPessoaArgumentCaptor.getValue();
+
+        assertThat(fotoPessoaCapturada).isNotNull();
+        assertThat(fotoPessoaCapturada.getBucket()).isEqualTo("foto-pessoa");
+        assertThat(fotoPessoaCapturada.getData()).isEqualTo(LocalDate.now());
+        assertThat(fotoPessoaCapturada.getPessoa()).isEqualTo(pessoa);
+
+        //Minio
+        ArgumentCaptor<PutObjectArgs> putObjectArgsArgumentCaptor = ArgumentCaptor.forClass(PutObjectArgs.class);
+        verify(minioService).enviarImagens(putObjectArgsArgumentCaptor.capture());
+        PutObjectArgs putObjectArgsCapturado = putObjectArgsArgumentCaptor.getValue();
+
+        assertThat(putObjectArgsCapturado).isNotNull();
+        assertThat(putObjectArgsCapturado.bucket()).isEqualTo("foto-pessoa");
+        assertThat(putObjectArgsCapturado.object()).isNotBlank();
+        assertThat(putObjectArgsCapturado.contentType()).isEqualTo("image/jpeg");
     }
 
     @Test
