@@ -3,8 +3,11 @@ package com.paulomarchon.projetopratico.pessoa;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
+
 public interface PessoaDao {
-    Pessoa buscarPessoaPorReferenciaDeId(Integer id);
+    Optional<Pessoa> buscarPessoa(Integer id);
+    Pessoa selecionarPessoaPorReferenciaDeId(Integer id);
     Page<Pessoa> buscarTodasPessoas(Pageable pageable);
     Page<Pessoa> buscarPessoaPorNome(String nome, Pageable pageable);
     Pessoa cadastrarPessoa(Pessoa pessoa);

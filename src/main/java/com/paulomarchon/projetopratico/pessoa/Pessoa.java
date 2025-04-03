@@ -1,10 +1,13 @@
 package com.paulomarchon.projetopratico.pessoa;
 
 import com.paulomarchon.projetopratico.endereco.Endereco;
+import com.paulomarchon.projetopratico.foto.FotoPessoa;
 import jakarta.persistence.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "pessoa", schema = "pessoas")
@@ -41,6 +44,9 @@ public class Pessoa {
                     @JoinColumn(name = "end_id", referencedColumnName = "end_id")
     )
     private Endereco endereco;
+
+    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<FotoPessoa> fotos = new HashSet<>();
 
     public Pessoa() {
     }
@@ -116,5 +122,13 @@ public class Pessoa {
 
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
+    }
+
+    public Set<FotoPessoa> getFotos() {
+        return fotos;
+    }
+
+    public void setFotos(Set<FotoPessoa> fotos) {
+        this.fotos = fotos;
     }
 }

@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository("pessoa-jpa")
 public class PessoaJpaDataAccessService implements PessoaDao{
     private final PessoaRepository pessoaRepository;
@@ -18,7 +20,12 @@ public class PessoaJpaDataAccessService implements PessoaDao{
     }
 
     @Override
-    public Pessoa buscarPessoaPorReferenciaDeId(Integer id) {
+    public Optional<Pessoa> buscarPessoa(Integer id) {
+        return pessoaRepository.findById(id);
+    }
+
+    @Override
+    public Pessoa selecionarPessoaPorReferenciaDeId(Integer id) {
         return pessoaRepository.getReferenceById(id);
     }
 

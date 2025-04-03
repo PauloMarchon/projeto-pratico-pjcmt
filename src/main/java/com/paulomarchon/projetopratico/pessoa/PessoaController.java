@@ -8,9 +8,13 @@ import com.paulomarchon.projetopratico.pessoa.dto.RequisicaoCadastroPessoa;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/pessoas")
@@ -82,6 +86,27 @@ public class PessoaController {
     @DeleteMapping("{pessoaId}")
     public ResponseEntity<?> excluirPessoa(@PathVariable Integer pessoaId) {
         pessoaService.excluirPessoa(pessoaId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping(value = "/{pessoaId}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> salvarFotosDePessoa(@PathVariable Integer pessoaId, @RequestParam("fotos") MultipartFile[] fotos) {
+        pessoaService.salvarFotos(pessoaId, fotos);
+
+        return new ResponseEntity<>("Foto armazenada com sucesso!", HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{pessoaId}/foto")
+    public ResponseEntity<List<String>> recuperarFotosDePessoa(@PathVariable Integer pessoaId) {
+        List<String> linksFotos = pessoaService.recuperarFotos(pessoaId);
+
+        return new ResponseEntity<>(linksFotos, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/foto")
+    public ResponseEntity<?> excluirFotosDePessoa(@RequestBody List<String> hashesFotos) {
+        pessoaService.excluirFotos(hashesFotos);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

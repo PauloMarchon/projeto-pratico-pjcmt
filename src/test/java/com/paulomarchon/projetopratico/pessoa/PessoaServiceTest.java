@@ -20,9 +20,11 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -383,5 +385,68 @@ public class PessoaServiceTest {
                 });
 
         verify(pessoaDao, never()).excluirPessoa(id);
+    }
+
+    @Test
+    @DisplayName("salvarFotos: Deve salvar as fotos enviadas com sucesso quando Pessoa existir")
+    void salvarFotos_quandoPessoaExistir_entaoSalvaAsFotosComSucesso() {
+        Integer id = 1;
+        MultipartFile[] fotos = new MultipartFile[]{ mock(MultipartFile.class) };
+
+        when(pessoaDao.buscarPessoa(id)).thenReturn(Optional.of(pessoa1));
+
+        emTeste.salvarFotos(id, fotos);
+
+        verify(fotoPessoaService, times(1)).salvarFotosDePessoa(pessoa1, fotos);
+
+    }
+
+    @Test
+    @DisplayName("salvarFotos: Deve lancar excecao quando Pessoa informada nao existir")
+    void salvarFotos_quandoPessoaNaoExistir_entaoLancaExcecao() {
+        Integer id = 8888;
+        MultipartFile[] fotos = new MultipartFile[]{ mock(MultipartFile.class) };
+
+        when(pessoaDao.buscarPessoa(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> emTeste.salvarFotos(id, fotos))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
+                .satisfies(exception -> {
+                    RecursoNaoEncontradoException ex = (RecursoNaoEncontradoException) exception;
+                    ProblemDetail problemDetail = ex.problemDetail();
+                    assertThat(problemDetail.getTitle()).isEqualTo("Recurso nao encontrado");
+                    assertThat(problemDetail.getDetail()).isEqualTo("Pessoa nao encontrada".formatted(id));
+                    assertThat(problemDetail.getProperties()).containsKey("timestamp");
+                });
+    }
+
+    @Test
+    @DisplayName("recuperarFotos: Deve retornar as fotos da Pessoa informada com sucesso")
+    void recuperarFotos_quandoPessoaExistir_entaoRetornarFotosComSucesso() {
+        Integer id = 1;
+
+        when(pessoaDao.buscarPessoa(id)).thenReturn(Optional.of(pessoa1));
+
+        emTeste.recuperarFotos(id);
+
+        verify(fotoPessoaService, times(1)).recuperarFotosDePessoa(pessoa1);
+    }
+
+    @Test
+    @DisplayName("recuperarFotos: Deve lancar excecao quando pessoa nao existir")
+    void recuperarFotos_quandoPessoaNaoExistir_entaoLancaExecao() {
+        Integer id = 8888;
+
+        when(pessoaDao.buscarPessoa(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> emTeste.recuperarFotos(id))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
+                .satisfies(exception -> {
+                    RecursoNaoEncontradoException ex = (RecursoNaoEncontradoException) exception;
+                    ProblemDetail problemDetail = ex.problemDetail();
+                    assertThat(problemDetail.getTitle()).isEqualTo("Recurso nao encontrado");
+                    assertThat(problemDetail.getDetail()).isEqualTo("Pessoa nao encontrada".formatted(id));
+                    assertThat(problemDetail.getProperties()).containsKey("timestamp");
+                });
     }
 }
